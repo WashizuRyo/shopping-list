@@ -41,24 +41,41 @@ class ShoppingListController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(ShoppingList $shoppingList)
     {
-        //
+        return Inertia::render('shopping-list/show', [
+            'shoppingList' => $shoppingList
+        ]);
+    }
+
+    public function edit(ShoppingList $shoppingList)
+    {
+        return Inertia::render('shopping-list/edit', [
+            'shoppingList' => $shoppingList
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, ShoppingList $shoppingList)
     {
-        //
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255']
+        ]);
+
+        $shoppingList->update($validated);
+
+        return redirect()->route('shopping_lists.show', $shoppingList);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(ShoppingList $shoppingList)
     {
-        //
+        $shoppingList->delete();
+
+        return redirect()->route('shopping_lists.index');
     }
 }

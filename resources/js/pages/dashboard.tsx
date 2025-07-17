@@ -37,19 +37,11 @@ export default function Dashboard() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <div>
-                {Object.entries(errors).map(([field, messages]) =>
-                    Array.isArray(messages) ? (
-                        messages.map((msg, i) => (
-                            <div key={field + i} className="text-sm text-red-500">
-                                {msg}
-                            </div>
-                        ))
-                    ) : (
-                        <div key={field} className="text-sm text-red-500">
-                            {messages}
-                        </div>
-                    ),
-                )}
+                {Object.entries(errors).map(([field, message]) => (
+                    <div key={field} className="text-sm text-red-500">
+                        {message}
+                    </div>
+                ))}
             </div>
             <div className="mx-auto max-w-2xl p-6">
                 <h1 className="mb-6 text-2xl font-bold">新しいショッピングリストを作成</h1>
@@ -109,7 +101,7 @@ export default function Dashboard() {
                                             />
                                         </div>
 
-                                        {data.items.length > 1 && (
+                                        {
                                             <button
                                                 type="button"
                                                 onClick={() => removeItem(index)}
@@ -117,7 +109,7 @@ export default function Dashboard() {
                                             >
                                                 削除
                                             </button>
-                                        )}
+                                        }
                                     </div>
                                 </div>
                             </div>

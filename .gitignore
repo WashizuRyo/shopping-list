@@ -23,3 +23,4 @@ yarn-error.log
 /.vscode
 /.zed
 graph.png
+database/schema/sqlite-schema.sql

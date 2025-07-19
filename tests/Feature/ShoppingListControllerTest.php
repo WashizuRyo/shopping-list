@@ -5,7 +5,7 @@ use App\Models\User;
 use App\Models\Item;
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-describe('ShoppingListContoller', function () {
+describe('ShoppingListController', function () {
   beforeEach(function () {
     $this->user = User::factory()->create();
     $this->actingAs($this->user);

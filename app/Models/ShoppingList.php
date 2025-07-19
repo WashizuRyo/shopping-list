@@ -24,6 +24,7 @@ class ShoppingList extends Model
     public function items(): BelongsToMany
     {
         return $this->belongsToMany(Item::class, 'item_shopping_list')
+            ->using(ItemShoppingList::class)
             ->withPivot('quantity', 'is_checked')
             ->withTimestamps();
     }

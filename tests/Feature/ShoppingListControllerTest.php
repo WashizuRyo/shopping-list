@@ -13,21 +13,16 @@ describe('ShoppingListController', function () {
 
   describe('GET /show', function () {
     it('ショッピングリストが表示されること', function () {
-      $shopping = ShoppingList::factory()->create([
-        'user_id' => $this->user->id,
-      ]);
-      $item = Item::factory()->create([
-        'user_id' => $this->user->id,
-        'name' => 'test item'
-      ]);
-      $shopping->items()->attach($item->id, [
-        'quantity' => 1,
-        'is_checked' => false,
-      ]);
+      $shopping = ShoppingList::factory()
+        ->hasAttached(
+            Item::factory()->create(['name' => 'test item', 'user_id' => $this->user->id]),
+            ['quantity' => 10, 'is_checked' => false]
+        )
+        ->create(['user_id' => $this->user->id, 'name' => 'test list']);
 
-        $this->get(route('shopping_lists.show', $shopping))
-        ->assertStatus(200)
-        ->assertSee($shopping->name)
+      $this->get(route('shopping_lists.show', $shopping))
+        ->assertOk()
+        ->assertSee('test list')
         ->assertSee('test item');
     });
   });
@@ -40,30 +35,23 @@ describe('ShoppingListController', function () {
           [
             'name' => 'りんご',
             'quantity' => 2,
-            'is_checked' => false,
           ],
         ],
       ];
 
       $response = $this->post(route('shopping_lists.store'), $data);
-      $shoppingList = ShoppingList::where('user_id', $this->user->id)->first();
-      $item = Item::where('name', 'りんご')->first();
+      $shoppingList = ShoppingList::latest('id')->first();
 
-      $response->assertStatus(302);
-      $this->assertDatabaseHas('shopping_lists', [
-        'name' => 'test list',
-        'user_id' => $this->user->id
-      ]);
-      $this->assertDatabaseHas('items', [
-        'name' => 'りんご',
-        'user_id' => $this->user->id
-      ]);
-      $this->assertDatabaseHas('item_shopping_list', [
-        'item_id' => $item->id,
-        'shopping_list_id' => $shoppingList->id,
-        'is_checked' => false,
-        'quantity' => 2,
-      ]);
+      $response->assertRedirect(route('shopping_lists.index'));
+
+      $this->assertEquals('test list', $shoppingList->name);
+      $this->assertEquals($this->user->id, $shoppingList->user_id);
+
+      $this->assertCount(1, $shoppingList->items);
+      $item = $shoppingList->items->first();
+      $this->assertEquals('りんご', $item->name);
+      $this->assertEquals(2, $item->pivot->quantity);
+      $this->assertFalse($item->pivot->is_checked);
     });
   });
 
@@ -91,17 +79,23 @@ describe('ShoppingListController', function () {
   });
 
   describe('PUT /update', function () {
+      beforeEach(function () {
+          $this->shopping = ShoppingList::factory()->create([
+              'user_id' => $this->user->id,
+              'name' => 'test list name'
+          ]);
+      });
+
       it('ショッピングリストの名前を変更できること', function () {
           $data = [
               'name' => 'changed list name'
           ];
-          $shopping = ShoppingList::factory()->create([
-              'user_id' => $this->user->id,
-              'name' => 'test list name'
-          ]);
 
-          $response = $this->put(route('shopping_lists.update', $shopping), $data);
-          $response->assertRedirect((route('shopping_lists.show', $shopping)));
+          $response = $this->put(route('shopping_lists.update', $this->shopping), $data);
+
+          $response->assertRedirect((route('shopping_lists.show', $this->shopping)));
+          $this->shopping->refresh();
+          $this->assertEquals('changed list name', $this->shopping->name);
       });
 
       it('アイテムを追加できること', function () {
@@ -114,19 +108,13 @@ describe('ShoppingListController', function () {
                   ]
               ]
           ];
-          $shopping = ShoppingList::factory()->create([
-              'user_id' => $this->user->id,
-              'name' => 'list name'
-          ]);
 
-          $response = $this->put(route('shopping_lists.update', $shopping), $data);
+          $response = $this->put(route('shopping_lists.update', $this->shopping), $data);
 
-          $shopping->refresh();
+          $response->assertRedirect(route('shopping_lists.show', $this->shopping));
 
-          $response->assertRedirect(route('shopping_lists.show', $shopping));
-
-          $item = $shopping->items->first();
-          $this->assertCount(1, $shopping->items);
+          $item = $this->shopping->items->first();
+          $this->assertCount(1, $this->shopping->items);
           $this->assertEquals('changed item name', $item->name);
           $this->assertEquals(5, $item->pivot->quantity);
       });

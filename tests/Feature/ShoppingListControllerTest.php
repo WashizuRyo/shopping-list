@@ -89,4 +89,46 @@ describe('ShoppingListController', function () {
       ->assertSee(32);
     });
   });
+
+  describe('PUT /update', function () {
+      it('ショッピングリストの名前を変更できること', function () {
+          $data = [
+              'name' => 'changed list name'
+          ];
+          $shopping = ShoppingList::factory()->create([
+              'user_id' => $this->user->id,
+              'name' => 'test list name'
+          ]);
+
+          $response = $this->put(route('shopping_lists.update', $shopping), $data);
+          $response->assertRedirect((route('shopping_lists.show', $shopping)));
+      });
+
+      it('アイテムを追加できること', function () {
+          $data = [
+              'name' => 'list name',
+              'items' => [
+                  [
+                      'name' => 'changed item name',
+                      'quantity' => 5
+                  ]
+              ]
+          ];
+          $shopping = ShoppingList::factory()->create([
+              'user_id' => $this->user->id,
+              'name' => 'list name'
+          ]);
+
+          $response = $this->put(route('shopping_lists.update', $shopping), $data);
+
+          $shopping->refresh();
+
+          $response->assertRedirect(route('shopping_lists.show', $shopping));
+
+          $item = $shopping->items->first();
+          $this->assertCount(1, $shopping->items);
+          $this->assertEquals('changed item name', $item->name);
+          $this->assertEquals(5, $item->pivot->quantity);
+      });
+  });
 });

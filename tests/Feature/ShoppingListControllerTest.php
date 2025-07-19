@@ -131,4 +131,17 @@ describe('ShoppingListController', function () {
           $this->assertEquals(5, $item->pivot->quantity);
       });
   });
+
+  describe('DELETE /destroy', function () {
+      it('ショッピングリストを削除できること', function () {
+          $shopping = ShoppingList::factory()->create([
+              'user_id' => $this->user->id
+          ]);
+
+          $response = $this->delete(route('shopping_lists.destroy', $shopping));
+
+          $response->assertRedirect(route('shopping_lists.index'));
+          $this->assertModelMissing($shopping);
+      });
+  });
 });

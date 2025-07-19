@@ -72,7 +72,7 @@ class ShoppingListController extends Controller
         $shoppingList->load(['items' => function ($query) {
             $query->withPivot('quantity', 'is_checked', 'created_at', 'updated_at');
         }]);
-        
+
         return Inertia::render('shopping-list/edit', [
             'shoppingList' => $shoppingList
         ]);
@@ -91,8 +91,9 @@ class ShoppingListController extends Controller
             'name' => $validated['name'],
         ]);
 
+        $items = $validated['items'] ?? [];
         $pivotData = [];
-        foreach ($validated['items'] as $itemData) {
+        foreach ($items as $itemData) {
             if (!empty(trim($itemData['name']))) {
                 $item = Item::firstOrCreate([
                     'user_id' => auth()->id(),

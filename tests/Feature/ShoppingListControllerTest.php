@@ -144,4 +144,20 @@ describe('ShoppingListController', function () {
           $this->assertModelMissing($shopping);
       });
   });
+
+  describe('GET /index', function () {
+      it('ショッピングリスト一覧が表示されること', function () {
+          ShoppingList::factory()->count(2)->sequence(
+              ['name' => 'first shopping list'],
+              ['name' => 'second shopping list']
+          )->create([
+              'user_id' => $this->user->id
+          ]);
+
+          $this->get(route('shopping_lists.index'))
+            ->assertOk()
+            ->assertSee('first shopping list')
+            ->assertSee('second shopping list');
+      });
+  });
 });

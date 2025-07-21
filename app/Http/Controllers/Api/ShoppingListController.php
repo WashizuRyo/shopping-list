@@ -86,6 +86,7 @@ class ShoppingListController extends Controller
             'items.*.name' => ['required_with:items', 'string', 'max:255'],
             'items.*.memo' => ['nullable', 'string', 'max:255'],
             'items.*.quantity' => ['required_with:items', 'integer', 'min:1'],
+            'items.*.is_checked' => ['required_with:items', 'boolean']
         ]);
         $shoppingList->update([
             'name' => $validated['name'],
@@ -103,7 +104,7 @@ class ShoppingListController extends Controller
                 ]);
                 $pivotData[$item->id] = [
                     'quantity' => $itemData['quantity'],
-                    'is_checked' => false,
+                    'is_checked' => $itemData['is_checked'],
                 ];
             }
         }

@@ -11,6 +11,7 @@ export default function EditShoppingList({ shoppingList }: { shoppingList: Shopp
             name: item.name,
             memo: item.memo || '',
             quantity: item.pivot?.quantity || 1,
+            is_checked: item.pivot?.is_checked || false
         })),
     });
 
@@ -23,6 +24,7 @@ export default function EditShoppingList({ shoppingList }: { shoppingList: Shopp
         name: '',
         memo: '',
         quantity: 1,
+        is_checked: false
     });
 
     const handleRemoveItem = (name: string) => {
@@ -34,7 +36,15 @@ export default function EditShoppingList({ shoppingList }: { shoppingList: Shopp
 
     const handleAddItem = () => {
         setData('items', [...data.items, newItem]);
-        setNewItem({ name: '', memo: '', quantity: 1 });
+        setNewItem({ name: '', memo: '', quantity: 1, is_checked: false });
+    };
+
+    const handleItemChange = (index: number, field: keyof ItemForm, value: string | number | boolean) => {
+        setData('items',
+            data.items.map((item, i) =>
+                i === index ? { ...item, [field]: value } : item
+            )
+        );
     };
 
     return (
@@ -124,12 +134,35 @@ export default function EditShoppingList({ shoppingList }: { shoppingList: Shopp
                 <div className="rounded border">
                     {data.items && data.items.length > 0 ? (
                         <ul className="divide-y">
-                            {data.items.map((item) => (
+                            {data.items.map((item, i) => (
                                 <li key={item.id} className="flex items-center justify-between p-4">
-                                    <div>
-                                        <span className="font-medium">{item.name}</span>
-                                        {item.memo && <span className="ml-2 text-gray-600">({item.memo})</span>}
-                                        <span className="ml-2 text-sm text-gray-500">x{item.quantity}</span>
+                                    <div className="flex flex-col md:flex-row md:items-center gap-2">
+                                        <input
+                                            type="text"
+                                            defaultValue={item.name}
+                                            onChange={e => handleItemChange(i, 'name', e.target.value)}
+                                            className="font-medium border rounded px-2 py-1"
+                                        />
+                                        <input
+                                            type="text"
+                                            defaultValue={item.memo}
+                                            onChange={e => handleItemChange(i, 'memo', e.target.value)}
+                                            className="ml-2 text-gray-600 border rounded px-2 py-1"
+                                            placeholder="メモ"
+                                        />
+                                        <input
+                                            type="number"
+                                            defaultValue={item.quantity}
+                                            min={1}
+                                            onChange={e => handleItemChange(i, 'quantity', Number(e.target.value))}
+                                            className="ml-2 text-sm text-gray-500 border rounded px-2 py-1 w-16"
+                                        />
+                                        <input
+                                            type="checkbox"
+                                            checked={item.is_checked}
+                                            onChange={e => handleItemChange(i, 'is_checked',e.target.checked)}
+                                            className="ml-2 text-sm text-gray-500 border rounded px-2 py-1 w-16"
+                                        />
                                     </div>
                                     <button
                                         onClick={() => handleRemoveItem(item.name)}

@@ -3,4 +3,5 @@ export type ItemForm = {
   name: string;
   memo?: string;
   quantity: number;
+  is_checked: boolean;
 }

@@ -104,7 +104,8 @@ describe('ShoppingListController', function () {
               'items' => [
                   [
                       'name' => 'changed item name',
-                      'quantity' => 5
+                      'quantity' => 5,
+                      'is_checked' => true
                   ]
               ]
           ];
@@ -117,6 +118,7 @@ describe('ShoppingListController', function () {
           $this->assertCount(1, $this->shopping->items);
           $this->assertEquals('changed item name', $item->name);
           $this->assertEquals(5, $item->pivot->quantity);
+          $this->assertTrue($item->pivot->is_checked);
       });
   });
 

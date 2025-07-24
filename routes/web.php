@@ -24,11 +24,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('shopping_lists.update');
     Route::delete('/shopping_lists/{shoppingList}', [ShoppingListController::class, 'destroy'])
         ->name('shopping_lists.destroy');
-    
-    Route::post('/shopping_lists/{shoppingList}/items', [ShoppingListController::class, 'addItem'])
-        ->name('shopping_lists.items.add');
-    Route::delete('/shopping_lists/{shoppingList}/items/{item}', [ShoppingListController::class, 'removeItem'])
-        ->name('shopping_lists.items.remove');
 });
 
 require __DIR__.'/settings.php';

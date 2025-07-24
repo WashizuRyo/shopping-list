@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ShoppingListController;
+use App\Http\Controllers\Api\ItemController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -24,6 +25,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('shopping_lists.update');
     Route::delete('/shopping_lists/{shoppingList}', [ShoppingListController::class, 'destroy'])
         ->name('shopping_lists.destroy');
+
+    Route::resource('items', ItemController::class);
 });
 
 require __DIR__.'/settings.php';

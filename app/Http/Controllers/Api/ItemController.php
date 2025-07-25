@@ -18,14 +18,34 @@ class ItemController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function create()
     {
-        //
+        return Inertia::render('items/create');
     }
 
-    public function show(string $id)
+    public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'memo' => ['nullable', 'string', 'max:255']
+        ]);
+
+        $item = Item::create([
+            'user_id' => auth()->id(),
+            'name' => $validated['name'],
+            'memo' => $validated['memo']
+        ]);
+
+        return Inertia::render('items/show', [
+            'item' => $item
+        ]);
+    }
+
+    public function show(Item $item)
+    {
+        return Inertia::render('items/show', [
+            'item' => $item
+        ]);
     }
 
     public function update(Request $request, string $id)

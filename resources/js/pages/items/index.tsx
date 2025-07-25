@@ -11,6 +11,7 @@ export default function ShoppingLists({ items }: { items: Item[] }) {
 
     return (
         <div>
+            <Link href={'/items/create'}>New Item</Link>
             <h1>Items</h1>
             <ul>
                 {items.map(({ name, id }) => (

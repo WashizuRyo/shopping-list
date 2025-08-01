@@ -82,7 +82,7 @@ export default function EditShoppingList({ shoppingList, items }: { shoppingList
 
             <div>Present Items</div>
             {items.map((item, i) => (
-                <div>{item.name}</div>
+                <div onClick={() => setData('items', [...data.items, {...item, is_checked: false, quantity: 1}])}>{item.name}</div>
             ))}
 
             <div className="mt-8">

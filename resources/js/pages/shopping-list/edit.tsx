@@ -1,9 +1,9 @@
-import { ShoppingList } from '@/types';
+import { Item, ShoppingList } from '@/types';
 import { ItemForm } from '@/types/item';
 import { Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 
-export default function EditShoppingList({ shoppingList }: { shoppingList: ShoppingList }) {
+export default function EditShoppingList({ shoppingList, items }: { shoppingList: ShoppingList; items: Item[] }) {
     const { data, setData, put, processing, errors } = useForm<{ name: string; items: ItemForm[] }>({
         name: shoppingList.name,
         items: shoppingList.items.map((item) => ({
@@ -27,10 +27,10 @@ export default function EditShoppingList({ shoppingList }: { shoppingList: Shopp
         is_checked: false
     });
 
-    const handleRemoveItem = (name: string) => {
+    const handleRemoveItem = (index: number) => {
         setData(
             'items',
-            data.items.filter((item) => item.name !== name),
+            data.items.filter((_, i) => i !== index),
         );
     };
 
@@ -40,10 +40,9 @@ export default function EditShoppingList({ shoppingList }: { shoppingList: Shopp
     };
 
     const handleItemChange = (index: number, field: keyof ItemForm, value: string | number | boolean) => {
-        setData('items',
-            data.items.map((item, i) =>
-                i === index ? { ...item, [field]: value } : item
-            )
+        setData(
+            'items',
+            data.items.map((item, i) => (i === index ? { ...item, [field]: value } : item)),
         );
     };
 
@@ -79,6 +78,16 @@ export default function EditShoppingList({ shoppingList }: { shoppingList: Shopp
                     Save
                 </button>
             </form>
+
+            <div>Present Items</div>
+            {items.map((item) => (
+                <button
+                    onClick={() => setData('items', [...data.items, { ...item, is_checked: false, quantity: 1 }])}
+                    className="m-3 rounded bg-blue-500 p-3"
+                >
+                    {item.name}
+                </button>
+            ))}
 
             <div className="mt-8">
                 <h2 className="mb-4 text-xl font-semibold">Items</h2>
@@ -135,37 +144,37 @@ export default function EditShoppingList({ shoppingList }: { shoppingList: Shopp
                     {data.items && data.items.length > 0 ? (
                         <ul className="divide-y">
                             {data.items.map((item, i) => (
-                                <li key={item.id} className="flex items-center justify-between p-4">
-                                    <div className="flex flex-col md:flex-row md:items-center gap-2">
+                                <li key={i} className="flex items-center justify-between p-4">
+                                    <div className="flex flex-col gap-2 md:flex-row md:items-center">
                                         <input
                                             type="text"
-                                            defaultValue={item.name}
-                                            onChange={e => handleItemChange(i, 'name', e.target.value)}
-                                            className="font-medium border rounded px-2 py-1"
+                                            value={item.name}
+                                            onChange={(e) => handleItemChange(i, 'name', e.target.value)}
+                                            className="rounded border px-2 py-1 font-medium"
                                         />
                                         <input
                                             type="text"
-                                            defaultValue={item.memo}
-                                            onChange={e => handleItemChange(i, 'memo', e.target.value)}
-                                            className="ml-2 text-gray-600 border rounded px-2 py-1"
+                                            value={item.memo}
+                                            onChange={(e) => handleItemChange(i, 'memo', e.target.value)}
+                                            className="ml-2 rounded border px-2 py-1 text-gray-600"
                                             placeholder="メモ"
                                         />
                                         <input
                                             type="number"
-                                            defaultValue={item.quantity}
+                                            value={item.quantity}
                                             min={1}
-                                            onChange={e => handleItemChange(i, 'quantity', Number(e.target.value))}
-                                            className="ml-2 text-sm text-gray-500 border rounded px-2 py-1 w-16"
+                                            onChange={(e) => handleItemChange(i, 'quantity', Number(e.target.value))}
+                                            className="ml-2 w-16 rounded border px-2 py-1 text-sm text-gray-500"
                                         />
                                         <input
                                             type="checkbox"
                                             checked={item.is_checked}
-                                            onChange={e => handleItemChange(i, 'is_checked',e.target.checked)}
-                                            className="ml-2 text-sm text-gray-500 border rounded px-2 py-1 w-16"
+                                            onChange={(e) => handleItemChange(i, 'is_checked', e.target.checked)}
+                                            className="ml-2 w-16 rounded border px-2 py-1 text-sm text-gray-500"
                                         />
                                     </div>
                                     <button
-                                        onClick={() => handleRemoveItem(item.name)}
+                                        onClick={() => handleRemoveItem(i)}
                                         className="rounded border border-red-300 px-3 py-1 text-red-600 hover:bg-red-50 hover:text-red-800"
                                     >
                                         削除

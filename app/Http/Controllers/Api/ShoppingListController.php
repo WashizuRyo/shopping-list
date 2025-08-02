@@ -72,9 +72,11 @@ class ShoppingListController extends Controller
         $shoppingList->load(['items' => function ($query) {
             $query->withPivot('quantity', 'is_checked', 'created_at', 'updated_at');
         }]);
+        $items = auth()->user()->items()->latest()->get();
 
         return Inertia::render('shopping-list/edit', [
-            'shoppingList' => $shoppingList
+            'shoppingList' => $shoppingList,
+            'items' => $items
         ]);
     }
 

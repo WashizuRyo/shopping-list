@@ -28,14 +28,11 @@ export default function EditShoppingList({ shoppingList, items }: { shoppingList
     });
 
     const handleRemoveItem = (index: number) => {
-        console.log(index);
-        console.log(data.items);
         setData(
             'items',
             data.items.filter((_, i) => i !== index),
         );
     };
-    console.log(data.items);
 
     const handleAddItem = () => {
         setData('items', [...data.items, newItem]);
